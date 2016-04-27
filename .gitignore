@@ -1,0 +1,6 @@
+# release packages
+/spoton-*.zip
+/spoton-*.json
+
+# vim
+*.swp

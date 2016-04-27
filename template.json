@@ -1,0 +1,86 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This template installs Spot On! (https://github.com/zalando/spoton, version SPOTON_VERSION) in your AWS account.",
+
+    "Resources": {
+        "SpotOnELBSyncFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Description": "Spot On! ELB synchronisation function. Keeps your ELB instance lists in sync with Spot Fleet Requests.",
+                "Runtime": "python2.7",
+                "MemorySize": "128",
+                "Timeout": "120",
+                "Code": {
+                    "S3Bucket": "pequod-public",
+                    "S3Key": "spoton/spoton-SPOTON_VERSION.zip"
+                },
+                "Handler": "spoton_elb_sync.lambda_handler",
+                "Role": { "Fn::GetAtt": ["SpotOnELBSyncRole", "Arn"] }
+			}
+        },
+        "SpotOnELBSyncRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+   				    "Version": "2012-10-17",
+					"Statement": [
+						{
+							"Effect": "Allow",
+							"Principal": {
+								"Service": "lambda.amazonaws.com"
+							},
+							"Action": "sts:AssumeRole"
+						}
+					]
+				},
+				"Policies": [
+                    {
+    					"PolicyName": "SpotOnELBSync",
+	    				"PolicyDocument":{
+		    				"Version": "2012-10-17",
+			    			"Statement": [
+				    			{
+					    			"Effect": "Allow",
+						    		"Action": [
+							    		"logs:CreateLogGroup",
+								    	"logs:CreateLogStream",
+									    "logs:PutLogEvents"
+    								],
+	    							"Resource": "arn:aws:logs:*:*:*"
+		    					},
+			    				{
+				    				"Effect": "Allow",
+					    			"Action": [
+						    			"elasticloadbalancing:DescribeLoadBalancers",
+							    		"elasticloadbalancing:DescribeTags",
+								    	"elasticloadbalancing:DescribeInstanceHealth",
+									    "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+    									"elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+	    								"ec2:DescribeSpotFleetInstances",
+		    							"ec2:DescribeInstanceStatus"
+			    					],
+				    				"Resource": "*"
+					    		}
+						    ]
+					    }
+                    }
+				]
+            }
+        },
+		"SpotOnELBSyncTimer": {
+			"Type": "AWS::Events::Rule",
+			"Properties": {
+                "Name": "SpotOnELBSyncTimer",
+                "Description": "Allows the Spot On! ELB sync to periodically check for registered spot instances in the elastic load balancers.",
+                "ScheduleExpression": "rate(1 minute)",
+                "State": "ENABLED",
+                "Targets": [
+                    {
+                        "Id": "SpotOnELBSyncFunction",
+                        "Arn": { "Fn::GetAtt": ["SpotOnELBSyncFunction", "Arn"] }
+                    }
+                ]
+            }
+		}
+    }
+}
