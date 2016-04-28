@@ -1,6 +1,7 @@
 # release packages
 /spoton-*.zip
 /spoton-*.json
+/scm-source.json
 
 # vim
 *.swp

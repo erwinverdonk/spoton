@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PACKAGE_FILES="spoton_elb_sync.py"
+PACKAGE_FILES="spoton_elb_sync.py scm-source.json"
 
 
 if [ -z "$1" ]; then
@@ -10,6 +10,9 @@ fi
 VERSION=$1
 
 set -e
+
+rm -f scm-source.json
+scm-source
 
 rm -f spoton-${VERSION}.zip
 zip spoton-${VERSION}.zip $PACKAGE_FILES

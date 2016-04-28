@@ -18,6 +18,22 @@
                 "Role": { "Fn::GetAtt": ["SpotOnELBSyncRole", "Arn"] }
             }
         },
+        "SpotOnELBSyncFunctionVersion": {
+            "Type": "AWS::Lambda::Version",
+            "Properties" : {
+                "Description": "SPOTON_VERSION",
+                "FunctionName": { "Ref": "SpotOnELBSyncFunction" }
+            }
+        },
+        "SpotOnELBSyncFunctionAlias": {
+            "Type": "AWS::Lambda::Alias",
+            "Properties" : {
+                "Name": "production",
+                "Description": "Points to the currently used Spot On! version",
+                "FunctionName": { "Ref": "SpotOnELBSyncFunction" },
+                "FunctionVersion": { "Fn::GetAtt": ["SpotOnELBSyncFunctionVersion", "Version"] }
+            }
+        },
         "SpotOnELBSyncRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -77,7 +93,7 @@
                 "Targets": [
                     {
                         "Id": "SpotOnELBSyncFunction",
-                        "Arn": { "Fn::GetAtt": ["SpotOnELBSyncFunction", "Arn"] }
+                        "Arn": { "Ref": "SpotOnELBSyncFunctionAlias" }
                     }
                 ]
             }
@@ -85,7 +101,7 @@
         "SpotOnELBSyncTimerPermission": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
-                "FunctionName": { "Ref": "SpotOnELBSyncFunction" },
+                "FunctionName": { "Ref": "SpotOnELBSyncFunctionAlias" },
                 "Action": "lambda:InvokeFunction",
                 "Principal": "events.amazonaws.com",
                 "SourceArn": { "Fn::GetAtt": ["SpotOnELBSyncTimer", "Arn"] }
