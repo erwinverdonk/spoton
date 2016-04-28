@@ -1,4 +1,4 @@
-<img src="spotlight.png" align="right" height="60"/>
+<img src="spotlight.png" align="right" height="90"/>
 # Spot On!
 
 This project helps you to use
