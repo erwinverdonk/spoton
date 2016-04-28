@@ -16,60 +16,60 @@
                 },
                 "Handler": "spoton_elb_sync.lambda_handler",
                 "Role": { "Fn::GetAtt": ["SpotOnELBSyncRole", "Arn"] }
-			}
+            }
         },
         "SpotOnELBSyncRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
-   				    "Version": "2012-10-17",
-					"Statement": [
-						{
-							"Effect": "Allow",
-							"Principal": {
-								"Service": "lambda.amazonaws.com"
-							},
-							"Action": "sts:AssumeRole"
-						}
-					]
-				},
-				"Policies": [
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Policies": [
                     {
-    					"PolicyName": "SpotOnELBSync",
-	    				"PolicyDocument":{
-		    				"Version": "2012-10-17",
-			    			"Statement": [
-				    			{
-					    			"Effect": "Allow",
-						    		"Action": [
-							    		"logs:CreateLogGroup",
-								    	"logs:CreateLogStream",
-									    "logs:PutLogEvents"
-    								],
-	    							"Resource": "arn:aws:logs:*:*:*"
-		    					},
-			    				{
-				    				"Effect": "Allow",
-					    			"Action": [
-						    			"elasticloadbalancing:DescribeLoadBalancers",
-							    		"elasticloadbalancing:DescribeTags",
-								    	"elasticloadbalancing:DescribeInstanceHealth",
-									    "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-    									"elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-	    								"ec2:DescribeSpotFleetInstances",
-		    							"ec2:DescribeInstanceStatus"
-			    					],
-				    				"Resource": "*"
-					    		}
-						    ]
-					    }
+                        "PolicyName": "SpotOnELBSync",
+                        "PolicyDocument":{
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "elasticloadbalancing:DescribeLoadBalancers",
+                                        "elasticloadbalancing:DescribeTags",
+                                        "elasticloadbalancing:DescribeInstanceHealth",
+                                        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                                        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                                        "ec2:DescribeSpotFleetInstances",
+                                        "ec2:DescribeInstanceStatus"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
                     }
-				]
+                ]
             }
         },
-		"SpotOnELBSyncTimer": {
-			"Type": "AWS::Events::Rule",
-			"Properties": {
+        "SpotOnELBSyncTimer": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
                 "Name": "SpotOnELBSyncTimer",
                 "Description": "Allows the Spot On! ELB sync to periodically check for registered spot instances in the elastic load balancers.",
                 "ScheduleExpression": "rate(1 minute)",
@@ -81,7 +81,7 @@
                     }
                 ]
             }
-		},
+        },
         "SpotOnELBSyncTimerPermission": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
