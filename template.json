@@ -81,6 +81,15 @@
                     }
                 ]
             }
-		}
+		},
+        "SpotOnELBSyncTimerPermission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": { "Ref": "SpotOnELBSyncFunction" },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "events.amazonaws.com",
+                "SourceArn": { "Fn::GetAtt": ["SpotOnELBSyncTimer", "Arn"] }
+            }
+        }
     }
 }
