@@ -16,12 +16,22 @@ your instances.
 Installing Spot On! in your account provides you the glue that makes Spot Fleet easily usable for
 your microservices.
 
+## How to install Spot On!?
+
+For the installation, Spot On! provides a simple
+[CloudFormation](https://aws.amazon.com/cloudformation/) template that you only need to instantiate
+once in your AWS account.
+
+Go to the [Release page](https://github.com/zalando/spoton/releases) and use the "Launch Stack"
+buttons for your prefered version.
+
+[![Launch Stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://github.com/zalando/spoton/releases)
+
 ## How to use Spot On!?
 
 Spot On! is a collection of [AWS Lambda](https://aws.amazon.com/lambda/) functions that provide the
-glue between the necessary services. For the installation, Spot On! provides a simple
-[CloudFormation](https://aws.amazon.com/cloudformation/) template that you only need to instantiate
-once in order to install Spot On! in your AWS account.
+glue between the necessary services. These are running in the background of your AWS account and
+will connect your services on-demand.
 
 ### AWS Elastic Load Balancing
 
@@ -29,16 +39,13 @@ SpotOn will register all spot instances of your Spot Fleet requests in the ELBs 
 [AWS Tags](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html) to the request. The
 general concept is as follows:
 
-* **Step 0:** (only required once) Install Spot On! with the CloudFormation template. Check out the
-  [Release page](https://github.com/zalando/spoton/releases) and use the "Launch Stack" buttons for
-  your prefered version.
 * **Step 1:** Create a Spot Fleet Request and use its ID in the next step.
-* **Step 2:** Create an ELB and give it the tag `SpotFleetRequestId =
+* **Step 2:** Create an ElasticLoadBalancer and give it the tag `SpotFleetRequestId =
   sfr-e2b3ce89-2441-4bdc-8d0d-b2828a1da8b7` (the ID of the step before).
 
-Spot On! can now connect the dots and knows that instances from your Spot Fleet should be
-registered in your ELB. Your instances will now automatically appear and disappear in the ELBs
-instance list.
+Spot On! can now automatically connect the dots and knows that instances from your Spot Fleet
+should be registered in your ELB. Your instances will now appear and disappear in the ELBs instance
+list.
 
 ### AWS CloudWatch (Auto Scaling)
 
