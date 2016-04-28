@@ -1,3 +1,4 @@
+<img src="spotlight.png" align="right" height="60"/>
 # Spot On!
 
 This project helps you to use
