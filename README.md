@@ -46,11 +46,38 @@ general concept is as follows:
 
 Spot On! can now automatically connect the dots and knows that instances from your Spot Fleet
 should be registered in your ELB. Your instances will now appear and disappear in the ELBs instance
-list.
+list. Be aware, that in difference to an AutoScalingGroup, Spot On! will currently not proactively
+shut down instances that do not come into service in the ELB after some grace time, PR welcome.
 
 ### AWS CloudWatch (Auto Scaling)
 
-Not implemented yet.
+*Warning: this is not yet implemented!*
+
+Using your [CloudWatch Alarms](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-createalarm.html),
+Spot On! can up or down scale your Spot Fleet. Currently, it uses your ElasticLoadBalancer's Tags
+to get its configuration.
+
+* **Step 1:** Create a Spot Fleet Request and use its ID in the next step.
+* **Step 2:** Set up CloudWatch Alarms which indicate when to up and/or down scale your Spot Fleet
+  Request.
+* **Step 3:** Create an ElasticLoadBalancer and give it the following tags:
+  * `SpotFleetRequestId = sfr-e2b3ce89-2441-4bdc-8d0d-b2828a1da8b7`
+    * The Spot Fleet Request ID of the step before.
+  * `SpotFleetRequestScaleUpAlarm = MyUpscaleAlarmName`
+    * The name of the CloudWatch Alarm that should trigger an upscale.
+  * `SpotFleetRequestScaleUpSteps = 2`
+    * The number of instances to scale up on each check interval; *optional*, default: 1
+  * `SpotFleetRequestScaleUpCooldown = 2`
+    * The number of minutes to wait for the next upscale after an upscale; *optional*, default: 5
+  * `SpotFleetRequestScaleDownAlarm = MyDownscaleAlarmName`
+    * The name of the CloudWatch Alarm that should trigger a downscale.
+  * `SpotFleetRequestScaleDownSteps = 1`
+    * The number of instances to scale down on each check interval; *optional*, default: 1
+  * `SpotFleetRequestScaleDownCooldown = 3`
+    * The number of minutes to wait for the next downscale after a downscale; *optional*, default: 5
+
+Spot On! will now automatically up- or downscale your Spot Fleet Request according to your
+CloudWatch Alarms.
 
 ## License
 
