@@ -106,6 +106,111 @@
                 "Principal": "events.amazonaws.com",
                 "SourceArn": { "Fn::GetAtt": ["SpotOnELBSyncTimer", "Arn"] }
             }
+        },
+
+
+        "SpotOnAutoScaleFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Description": "Spot On! Auto Scale function. Automatically scales the target capacity of your Spot Fleet Requests.",
+                "Runtime": "python2.7",
+                "MemorySize": "128",
+                "Timeout": "120",
+                "Code": {
+                    "S3Bucket": "pequod-public",
+                    "S3Key": "spoton/spoton-SPOTON_VERSION.zip"
+                },
+                "Handler": "spoton_auto_scale.lambda_handler",
+                "Role": { "Fn::GetAtt": ["SpotOnAutoScaleRole", "Arn"] }
+            }
+        },
+        "SpotOnAutoScaleFunctionVersion": {
+            "Type": "AWS::Lambda::Version",
+            "Properties" : {
+                "Description": "SPOTON_VERSION",
+                "FunctionName": { "Ref": "SpotOnAutoScaleFunction" }
+            }
+        },
+        "SpotOnAutoScaleFunctionAlias": {
+            "Type": "AWS::Lambda::Alias",
+            "Properties" : {
+                "Name": "production",
+                "Description": "Points to the currently used Spot On! version",
+                "FunctionName": { "Ref": "SpotOnAutoScaleFunction" },
+                "FunctionVersion": { "Fn::GetAtt": ["SpotOnAutoScaleFunctionVersion", "Version"] }
+            }
+        },
+        "SpotOnAutoScaleRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "SpotOnAutoScale",
+                        "PolicyDocument":{
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "elasticloadbalancing:DescribeLoadBalancers",
+                                        "elasticloadbalancing:DescribeTags",
+                                        "elasticloadbalancing:AddTags",
+                                        "cloudwatch:DescribeAlarms",
+                                        "ec2:DescribeSpotFleetRequests",
+                                        "ec2:ModifySpotFleetRequest"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "SpotOnAutoScaleTimer": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
+                "Name": "SpotOnAutoScaleTimer",
+                "Description": "Allows the Spot On! Auto Scale to periodically check your CloudWatch alarms and react with scaling.",
+                "ScheduleExpression": "rate(1 minute)",
+                "State": "ENABLED",
+                "Targets": [
+                    {
+                        "Id": "SpotOnAutoScaleFunction",
+                        "Arn": { "Ref": "SpotOnAutoScaleFunctionAlias" }
+                    }
+                ]
+            }
+        },
+        "SpotOnAutoScaleTimerPermission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": { "Ref": "SpotOnAutoScaleFunctionAlias" },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "events.amazonaws.com",
+                "SourceArn": { "Fn::GetAtt": ["SpotOnAutoScaleTimer", "Arn"] }
+            }
         }
     }
 }

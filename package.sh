@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PACKAGE_FILES="spoton_elb_sync.py scm-source.json"
+PACKAGE_FILES="spoton_elb_sync.py spoton_auto_scale.py scm-source.json"
 
 
 if [ -z "$1" ]; then

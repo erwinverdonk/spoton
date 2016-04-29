@@ -51,8 +51,6 @@ shut down instances that do not come into service in the ELB after some grace ti
 
 ### AWS CloudWatch (Auto Scaling)
 
-*Warning: this is not yet implemented!*
-
 Using your [CloudWatch Alarms](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-createalarm.html),
 Spot On! can up or down scale your Spot Fleet. Currently, it uses your ElasticLoadBalancer's Tags
 to get its configuration.
@@ -63,6 +61,10 @@ to get its configuration.
 * **Step 3:** Create an ElasticLoadBalancer and give it the following tags:
   * `SpotFleetRequestId = sfr-e2b3ce89-2441-4bdc-8d0d-b2828a1da8b7`
     * The Spot Fleet Request ID of the step before.
+  * `SpotFleetRequestScaleMin = 2`
+    * The minimum amount of instances that should always run; *optional*, default: 1
+  * `SpotFleetRequestScaleMax = 10`
+    * The maximum amount of instances that should run; *optional*, default: 20
   * `SpotFleetRequestScaleUpAlarm = MyUpscaleAlarmName`
     * The name of the CloudWatch Alarm that should trigger an upscale.
   * `SpotFleetRequestScaleUpSteps = 2`
